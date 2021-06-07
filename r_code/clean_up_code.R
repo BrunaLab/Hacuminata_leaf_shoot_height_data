@@ -126,11 +126,18 @@ ha_size_jan98$trt <- as.factor(ha_size_jan98$trt)
 
 ha_size_data<-full_join(ha_size_jan98,ha_size_aug98)
 
+# Change the treatment ID from numbers to useful codes
+ha_size_data$trt<-as.character(ha_size_data$trt)
+ha_size_data$trt<-gsub("1","fert_pollen",ha_size_data$trt)
+ha_size_data$trt<-gsub("2","pollen",ha_size_data$trt)
+ha_size_data$trt<-gsub("3","fert",ha_size_data$trt)
+ha_size_data$trt<-gsub("4","control",ha_size_data$trt)
+ha_size_data$trt<-as.factor(ha_size_data$trt)
 
 #TODO: need to do the following
 
 # 108 missing in Jan
 # what is difference btween seeds collected and sds?
-# need to chnage the jan data to the import leaf-level data and add it up
+# need to change the jan data to the import leaf-level data and add it up
 
 write_csv(ha_size_data,"./data_clean/ha_size_data_1998_cor.csv")
