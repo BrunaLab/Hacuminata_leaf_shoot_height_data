@@ -109,7 +109,6 @@ colnames(AREAS)
 ha_size_jan98<-AREAS %>% 
   select("plant_id"=`PLANT ID#`,
          "trt"= treatment,
-         "sds"="SEEDS COLLECTED 98",
          "flrs"="# OF FLRS 98",
          "frts_collected"="FRUITS COLLECTED 98",
          "dev_frts"="# OF DEV FRTS 98",
