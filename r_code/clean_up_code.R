@@ -11,7 +11,7 @@ library(readxl)
 # load individual datafiles -----------------------------------------------
 
 # Plant Size at T0
-ha_size_aug98<-read_xls("./data_raw/LEAF AREAS AUG 1998.xls",skip = 1)
+ha_size_aug98<-read_xls("./data_raw/LEAF_AREAS_AUG_1998.xls",skip = 1)
 
 # Correct column names, fill in the number of shoots for each plant
 ha_size_aug98<-ha_size_aug98 %>% 
