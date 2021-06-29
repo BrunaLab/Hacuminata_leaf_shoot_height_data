@@ -4,9 +4,9 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This repository is to clean and organize data on the size of individual _Heliconia acuminata_ plants. For each plant there are data on the total number of leaves, shoots, the areas of each leaf, the total leaf area of the plant, and the plant height.
+This repository is to clean and organize data on leaf length, leaf area (individual leaves, total plant leaf area), shoot number, and height of _Heliconia acuminata_ plants found at reserve 1501 of the Biological Dynamics of Forest Fragments Project (Manaus, Brazil).
 
-The data are from a pilot study to test for costs of reproduction in *H. acuminata* conducted during 1998-1999 field season. Plants were assigned to one of four treatments: (1) fertilizer addition + manually hand-pollinate all open flowers with pollen from other plants, (2) Manually hand-pollinate, (3) fertilizer addition, (4) Control plants. The experiment was not particularly well thought out and I ended it after a few months (at the time I knew relatively little about _H. acuminata_ growth and reproduction; I soon realized the treatments were unlikely to be effective because of the way the fertilizer was being applied and the difficulty I was having hand pollinating plants). However, the data set has value for its detailed breakdown of plant size. For each plant I measured:
+The data are from a pilot study testing for costs of reproduction in *H. acuminata* conducted during 1998-1999 field season. Plants were assigned to one of four treatments: (1) fertilizer addition + manually hand-pollinate all open flowers with pollen from other plants, (2) Manually hand-pollinate, (3) fertilizer addition, (4) Control plants. At the time I knew relatively little about _H. acuminata_ growth and reproduction; I soon realized the treatments were unlikely to be effective because of the way the fertilizer was being applied and the difficulty I was having hand pollinating plants. However, the data set has value for its detailed breakdown of plant allometry. For each plant I measured:
 
 1. Height to the top of the tallest leaf
 2. Number of shoots
@@ -16,7 +16,7 @@ The data are from a pilot study to test for costs of reproduction in *H. acumina
 Using No. 3 one can then calculate:
 
 5. Total leaf number
-6. Area of each leaf (using a regression equation calculated with [these data](10.6084/m9.figshare.92691))
+6. Area of each leaf (using the regression equation found in [Bruna et al. 2002](https://www.jstor.org/stable/3072265))
 7. Total plant leaf area
 
 
