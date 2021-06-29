@@ -1,5 +1,5 @@
 
-# Hacuminata_leaf_shoot_height_data
+**Data on leaf area, shoot number, and height of reproductive _H. acuminata_**
 
 <!-- badges: start -->
 <!-- badges: end -->
