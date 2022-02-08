@@ -1,7 +1,8 @@
 
-# Hacuminata_leaf_shoot_height_data
+**Data on leaf area, shoot number, and height of reproductive _H. acuminata_**
 
 <!-- badges: start -->
+[![DOI](https://zenodo.org/badge/371151042.svg)](https://zenodo.org/badge/latestdoi/371151042)
 <!-- badges: end -->
 
 This repository is to clean and organize data on leaf length, leaf area (individual leaves, total plant leaf area), shoot number, and height of _Heliconia acuminata_ plants found at reserve 1501 of the Biological Dynamics of Forest Fragments Project (Manaus, Brazil).
