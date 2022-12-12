@@ -198,9 +198,9 @@ ranges<-ha_size_data %>%
 plant_repro_summary<-ha_size_data %>% 
   group_by(plant_id) %>% 
   filter(mo=="01") %>% 
-  select(flrs, dev_frts,frts_collected,sds_collected) %>% 
+  select(flrs, dev_frts,frts_collected,sds_collected,sds_per_frt) %>% 
   ungroup() %>% 
-  summarise(across("flrs":"sds_collected",
+  summarise(across("flrs":"sds_per_frt",
                    list(mean = mean, 
                         sd = sd, 
                         low=min,
@@ -223,6 +223,7 @@ plant_repro_summary<-ha_size_data %>%
   unite("range_dev_frts",low_dev_frts,high_dev_frts,sep="-") %>% 
   unite("range_frts_collected",low_frts_collected,high_frts_collected,sep="-") %>% 
   unite("range_sds_collected",low_sds_collected,high_sds_collected,sep="-") %>% 
+  unite("range_sds_per_frt",low_sds_per_frt,high_sds_per_frt,sep="-") %>% 
 pivot_longer(
   cols = starts_with("range_"),
   names_to = "stagerange",
@@ -266,21 +267,30 @@ n_plants_sds<-ha_size_data %>%
 n_plants_sds<-n_plants_sds %>% 
   mutate(stage="sds_collected")
 
+
+n_plants_sds_per_frt<-ha_size_data %>% 
+  filter(mo=="01") %>% 
+  filter(!is.na(sds_per_frt)) %>% 
+  summarize(n=n_distinct(plant_id))
+n_plants_sds_per_frt<-n_plants_sds_per_frt %>% 
+  mutate(stage="sds_per_frt")
+
 n_plants_stages<-bind_rows(n_plants_flrs,
                            n_plants_frts_dev,
                            n_plants_frts_coll,
-                           n_plants_sds)
+                           n_plants_sds,
+                           n_plants_sds_per_frt)
 
 
 plant_repro_summary<-plant_repro_summary %>% 
   left_join(n_plants_stages)
-
+plant_repro_summary
 
 hist(ha_size_data$flrs)
 hist(ha_size_data$dev_frts)
 hist(ha_size_data$frts_collected)
 hist(ha_size_data$sds_collected)
-
+hist(ha_size_data$sds_per_frt)
 
 # save as a CSV file ------------------------------------------------------
 write_csv(ha_size_data, "./data_clean/ha_size_data_1998_cor.csv")
