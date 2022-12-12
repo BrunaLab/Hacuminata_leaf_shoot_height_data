@@ -194,14 +194,15 @@ rm(AREAS,
 #   select(-low, -high)
 
 
-# summarize mean, sd, range of each repro variable  -----------------------
+# summarize mean, sd, range of each repro variable for each trt -----------------------
 
 
-plant_repro_summary <- ha_size_data %>%
-  group_by(plant_id) %>%
+plant_repro_summary_trt <- ha_size_data %>%
+  group_by(plant_id,trt) %>%
   filter(mo == "01") %>%
-  select(flrs, dev_frts, frts_collected, sds_collected, sds_per_frt) %>%
+  select(trt,flrs, dev_frts, frts_collected, sds_collected, sds_per_frt) %>%
   ungroup() %>%
+  group_by(trt) %>% 
   summarise(across("flrs":"sds_per_frt",
     list(
       mean = mean,
@@ -240,9 +241,133 @@ plant_repro_summary <- ha_size_data %>%
   ) %>%
   filter((stage == stagesd) == TRUE) %>%
   filter((stage == stagerange) == TRUE) %>%
+  select(trt,stage, mean, sd, range)
+
+plant_repro_summary_trt
+
+
+# add sample size for each reprod variable --------------------------------
+
+
+
+
+n_plants_flrs <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(flrs)) %>%
+  group_by(trt) %>% 
+  summarize(n = n_distinct(plant_id))
+n_plants_flrs <- n_plants_flrs %>%
+  mutate(stage = "flrs")
+
+n_plants_frts_dev <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(dev_frts)) %>%
+  group_by(trt) %>% 
+  summarize(n = n_distinct(plant_id))
+n_plants_frts_dev <- n_plants_frts_dev %>%
+  mutate(stage = "dev_frts")
+
+n_plants_frts_coll <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(frts_collected)) %>%
+  group_by(trt) %>% 
+  summarize(n = n_distinct(plant_id))
+n_plants_frts_coll <- n_plants_frts_coll %>%
+  mutate(stage = "frts_collected")
+
+n_plants_sds <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(sds_collected)) %>%
+  group_by(trt) %>% 
+  summarize(n = n_distinct(plant_id))
+n_plants_sds <- n_plants_sds %>%
+  mutate(stage = "sds_collected")
+
+n_plants_sds_per_frt <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(sds_per_frt)) %>%
+  group_by(trt) %>% 
+  summarize(n = n_distinct(plant_id))
+n_plants_sds_per_frt <- n_plants_sds_per_frt %>%
+  mutate(stage = "sds_per_frt")
+
+n_plants_stages <- bind_rows(
+  n_plants_flrs,
+  n_plants_frts_dev,
+  n_plants_frts_coll,
+  n_plants_sds,
+  n_plants_sds_per_frt
+)
+
+
+plant_repro_summary_trt <- plant_repro_summary_trt %>%
+  left_join(n_plants_stages)
+plant_repro_summary_trt
+
+
+rm(n_plants_flrs,
+   n_plants_frts_dev,
+   n_plants_frts_coll,
+   n_plants_sds,
+   n_plants_sds_per_frt,
+   n_plants_stages
+)
+
+
+
+
+
+#  summary all trts combined ----------------------------------------------
+
+
+
+
+plant_repro_summary_overall <- ha_size_data %>%
+  group_by(plant_id) %>%
+  filter(mo == "01") %>%
+  select(flrs, dev_frts, frts_collected, sds_collected, sds_per_frt) %>%
+  ungroup() %>%
+  summarise(across("flrs":"sds_per_frt",
+                   list(
+                     mean = mean,
+                     sd = sd,
+                     low = min,
+                     high = max
+                   ),
+                   na.rm = TRUE,
+                   .names = "{fn}_{col}"
+  )) %>%
+  pivot_longer(
+    cols = starts_with("mean_"),
+    names_to = "stage",
+    names_prefix = "mean_",
+    values_to = "mean",
+    values_drop_na = FALSE
+  ) %>%
+  pivot_longer(
+    cols = starts_with("sd_"),
+    names_to = "stagesd",
+    names_prefix = "sd_",
+    values_to = "sd",
+    values_drop_na = FALSE
+  ) %>%
+  unite("range_flrs", low_flrs, high_flrs, sep = "-") %>%
+  unite("range_dev_frts", low_dev_frts, high_dev_frts, sep = "-") %>%
+  unite("range_frts_collected", low_frts_collected, high_frts_collected, sep = "-") %>%
+  unite("range_sds_collected", low_sds_collected, high_sds_collected, sep = "-") %>%
+  unite("range_sds_per_frt", low_sds_per_frt, high_sds_per_frt, sep = "-") %>%
+  pivot_longer(
+    cols = starts_with("range_"),
+    names_to = "stagerange",
+    names_prefix = "range_",
+    values_to = "range",
+    values_drop_na = FALSE
+  ) %>%
+  filter((stage == stagesd) == TRUE) %>%
+  filter((stage == stagerange) == TRUE) %>%
   select(stage, mean, sd, range)
 
-plant_repro_summary
+plant_repro_summary_overall
 
 
 # add sample size for each reprod variable --------------------------------
@@ -278,7 +403,6 @@ n_plants_sds <- ha_size_data %>%
 n_plants_sds <- n_plants_sds %>%
   mutate(stage = "sds_collected")
 
-
 n_plants_sds_per_frt <- ha_size_data %>%
   filter(mo == "01") %>%
   filter(!is.na(sds_per_frt)) %>%
@@ -295,9 +419,9 @@ n_plants_stages <- bind_rows(
 )
 
 
-plant_repro_summary <- plant_repro_summary %>%
+plant_repro_summary_overall <- plant_repro_summary_overall %>%
   left_join(n_plants_stages)
-plant_repro_summary
+plant_repro_summary_overall
 
 
 rm(n_plants_flrs,
@@ -307,6 +431,8 @@ rm(n_plants_flrs,
    n_plants_sds_per_frt,
    n_plants_stages
 )
+
+
 
 
 # histograms of each repro variable ---------------------------------------
@@ -320,7 +446,8 @@ hist(ha_size_data$sds_per_frt)
 
 # save as a CSV file ------------------------------------------------------
 write_csv(ha_size_data, "./data_clean/ha_size_data_1998_cor.csv")
-write_csv(plant_repro_summary, "./data_clean/plant_repro_summary.csv")
+write_csv(plant_repro_summary_trt, "./data_clean/plant_repro_summary_trt.csv")
+write_csv(plant_repro_summary_overall, "./data_clean/plant_repro_summary_overall.csv")
 
 # TODO: need to do the following
 
