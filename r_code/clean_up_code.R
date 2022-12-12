@@ -294,6 +294,7 @@ hist(ha_size_data$sds_per_frt)
 
 # save as a CSV file ------------------------------------------------------
 write_csv(ha_size_data, "./data_clean/ha_size_data_1998_cor.csv")
+write_csv(plant_repro_summary, "./data_clean/plant_repro_summary.csv")
 
 # TODO: need to do the following
 
