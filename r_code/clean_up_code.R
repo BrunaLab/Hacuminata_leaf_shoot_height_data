@@ -95,13 +95,13 @@ ha_size_aug98$shoots <- ifelse(ha_size_aug98$plant_id == "79", 5,
 
 
 # add height data to LA data ----------------------------------------------
-ha_size_aug98 <- left_join(ha_size_aug98, ht_aug98) %>% 
-  relocate(trt,ht,shoots,lvs,.after=plant_id)
-# 
+ha_size_aug98 <- left_join(ha_size_aug98, ht_aug98) %>%
+  relocate(trt, ht, shoots, lvs, .after = plant_id)
+#
 rm(ht_aug98)
 
-ha_size_aug98$yr<-as.factor("1998")
-ha_size_aug98$mo<-as.factor("08")
+ha_size_aug98$yr <- as.factor("1998")
+ha_size_aug98$mo <- as.factor("08")
 
 ha_size_aug98 <- ha_size_aug98 %>%
   select(
@@ -136,28 +136,28 @@ ha_size_jan98 <- AREAS %>%
 ha_size_jan98$plant_id <- as.factor(ha_size_jan98$plant_id)
 ha_size_jan98$trt <- as.factor(ha_size_jan98$trt)
 
-ha_size_jan98$yr<-as.factor("1998")
-ha_size_jan98$mo<-as.factor("01")
+ha_size_jan98$yr <- as.factor("1998")
+ha_size_jan98$mo <- as.factor("01")
 
 names(ha_size_aug98)
 names(ha_size_jan98)
-ha_size_data <- 
-  bind_rows(ha_size_jan98, ha_size_aug98) %>% 
-    # Change the treatment ID from numbers to useful codes
-    mutate(trt=case_when( 
+ha_size_data <-
+  bind_rows(ha_size_jan98, ha_size_aug98) %>%
+  # Change the treatment ID from numbers to useful codes
+  mutate(trt = case_when(
     trt == "1" ~ "fert_pollen",
     trt == "2" ~ "pollen",
     trt == "3" ~ "fert",
     trt == "4" ~ "control",
-    TRUE ~ as.character(trt))
-    ) %>% 
-  arrange(yr,mo, dev_frts,frts_collected,sds_collected) %>% 
-  mutate(trt=as.factor(trt)) %>% 
-  mutate(sds_per_frt=sds_collected/frts_collected) %>% 
-  relocate(dev_frts,.before="frts_collected") %>% 
-  relocate(c(shoots,ht,total_la),.after="trt") %>% 
-  relocate(sds_per_frt,.after="frts_collected") %>% 
-  relocate(lvs,.before="total_la") 
+    TRUE ~ as.character(trt)
+  )) %>%
+  arrange(yr, mo, dev_frts, frts_collected, sds_collected) %>%
+  mutate(trt = as.factor(trt)) %>%
+  mutate(sds_per_frt = sds_collected / frts_collected) %>%
+  relocate(dev_frts, .before = "frts_collected") %>%
+  relocate(c(shoots, ht, total_la), .after = "trt") %>%
+  relocate(sds_per_frt, .after = "frts_collected") %>%
+  relocate(lvs, .before = "total_la")
 
 
 
@@ -175,114 +175,126 @@ ha_size_data <-
 
 hist(ha_size_data$flrs)
 
-# ranges 
+# ranges
 
-ranges<-ha_size_data %>% 
-  filter(mo=="01") %>%  
-  summarize(flrs=range(flrs, na.rm=TRUE),
-            frts_dev=range(dev_frts, na.rm=TRUE),
-            frts_collect=range(frts_collected, na.rm=TRUE),
-            sds_collected=range(sds_collected, na.rm=TRUE)
-  ) %>% 
-  mutate(range=c("low","high"),.before=1) %>% 
+ranges <- ha_size_data %>%
+  filter(mo == "01") %>%
+  summarize(
+    flrs = range(flrs, na.rm = TRUE),
+    frts_dev = range(dev_frts, na.rm = TRUE),
+    frts_collect = range(frts_collected, na.rm = TRUE),
+    sds_collected = range(sds_collected, na.rm = TRUE)
+  ) %>%
+  mutate(range = c("low", "high"), .before = 1) %>%
   pivot_longer(
     cols = "flrs":"sds_collected",
-    values_to = 'value',
-    names_to= 'stage') %>% 
-  pivot_wider(id_cols="stage",
-              names_from="range") %>% 
-  mutate(range=paste(low,high,sep="-" )) %>% 
-  select(-low,-high)
+    values_to = "value",
+    names_to = "stage"
+  ) %>%
+  pivot_wider(
+    id_cols = "stage",
+    names_from = "range"
+  ) %>%
+  mutate(range = paste(low, high, sep = "-")) %>%
+  select(-low, -high)
 
 
-plant_repro_summary<-ha_size_data %>% 
-  group_by(plant_id) %>% 
-  filter(mo=="01") %>% 
-  select(flrs, dev_frts,frts_collected,sds_collected,sds_per_frt) %>% 
-  ungroup() %>% 
+plant_repro_summary <- ha_size_data %>%
+  group_by(plant_id) %>%
+  filter(mo == "01") %>%
+  select(flrs, dev_frts, frts_collected, sds_collected, sds_per_frt) %>%
+  ungroup() %>%
   summarise(across("flrs":"sds_per_frt",
-                   list(mean = mean, 
-                        sd = sd, 
-                        low=min,
-                        high=max), 
-                   na.rm = TRUE, 
-                   .names = "{fn}_{col}")) %>% 
+    list(
+      mean = mean,
+      sd = sd,
+      low = min,
+      high = max
+    ),
+    na.rm = TRUE,
+    .names = "{fn}_{col}"
+  )) %>%
   pivot_longer(
     cols = starts_with("mean_"),
     names_to = "stage",
     names_prefix = "mean_",
     values_to = "mean",
-    values_drop_na = FALSE) %>% 
+    values_drop_na = FALSE
+  ) %>%
   pivot_longer(
     cols = starts_with("sd_"),
     names_to = "stagesd",
     names_prefix = "sd_",
     values_to = "sd",
-    values_drop_na = FALSE) %>% 
-  unite("range_flrs",low_flrs,high_flrs,sep="-") %>% 
-  unite("range_dev_frts",low_dev_frts,high_dev_frts,sep="-") %>% 
-  unite("range_frts_collected",low_frts_collected,high_frts_collected,sep="-") %>% 
-  unite("range_sds_collected",low_sds_collected,high_sds_collected,sep="-") %>% 
-  unite("range_sds_per_frt",low_sds_per_frt,high_sds_per_frt,sep="-") %>% 
-pivot_longer(
-  cols = starts_with("range_"),
-  names_to = "stagerange",
-  names_prefix = "range_",
-  values_to = "range",
-  values_drop_na = FALSE)  %>% 
-  filter((stage==stagesd)==TRUE) %>% 
-  filter((stage==stagerange)==TRUE) %>% 
-  select(stage,mean,sd,range)
-  
+    values_drop_na = FALSE
+  ) %>%
+  unite("range_flrs", low_flrs, high_flrs, sep = "-") %>%
+  unite("range_dev_frts", low_dev_frts, high_dev_frts, sep = "-") %>%
+  unite("range_frts_collected", low_frts_collected, high_frts_collected, sep = "-") %>%
+  unite("range_sds_collected", low_sds_collected, high_sds_collected, sep = "-") %>%
+  unite("range_sds_per_frt", low_sds_per_frt, high_sds_per_frt, sep = "-") %>%
+  pivot_longer(
+    cols = starts_with("range_"),
+    names_to = "stagerange",
+    names_prefix = "range_",
+    values_to = "range",
+    values_drop_na = FALSE
+  ) %>%
+  filter((stage == stagesd) == TRUE) %>%
+  filter((stage == stagerange) == TRUE) %>%
+  select(stage, mean, sd, range)
+
 plant_repro_summary
 
 
 
 
-n_plants_flrs<-ha_size_data %>% 
-  filter(mo=="01") %>% 
-  filter(!is.na(flrs)) %>% 
-  summarize(n=n_distinct(plant_id))
-n_plants_flrs<-n_plants_flrs %>% 
-  mutate(stage="flrs")
+n_plants_flrs <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(flrs)) %>%
+  summarize(n = n_distinct(plant_id))
+n_plants_flrs <- n_plants_flrs %>%
+  mutate(stage = "flrs")
 
-n_plants_frts_dev<-ha_size_data %>% 
-  filter(mo=="01") %>% 
-  filter(!is.na(dev_frts)) %>% 
-  summarize(n=n_distinct(plant_id))
-n_plants_frts_dev<-n_plants_frts_dev %>% 
-  mutate(stage="dev_frts")
+n_plants_frts_dev <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(dev_frts)) %>%
+  summarize(n = n_distinct(plant_id))
+n_plants_frts_dev <- n_plants_frts_dev %>%
+  mutate(stage = "dev_frts")
 
-n_plants_frts_coll<-ha_size_data %>% 
-  filter(mo=="01") %>% 
-  filter(!is.na(frts_collected)) %>% 
-  summarize(n=n_distinct(plant_id))
-n_plants_frts_coll<-n_plants_frts_coll %>% 
-  mutate(stage="frts_collected")
+n_plants_frts_coll <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(frts_collected)) %>%
+  summarize(n = n_distinct(plant_id))
+n_plants_frts_coll <- n_plants_frts_coll %>%
+  mutate(stage = "frts_collected")
 
-n_plants_sds<-ha_size_data %>% 
-  filter(mo=="01") %>% 
-  filter(!is.na(sds_collected)) %>% 
-  summarize(n=n_distinct(plant_id))
-n_plants_sds<-n_plants_sds %>% 
-  mutate(stage="sds_collected")
-
-
-n_plants_sds_per_frt<-ha_size_data %>% 
-  filter(mo=="01") %>% 
-  filter(!is.na(sds_per_frt)) %>% 
-  summarize(n=n_distinct(plant_id))
-n_plants_sds_per_frt<-n_plants_sds_per_frt %>% 
-  mutate(stage="sds_per_frt")
-
-n_plants_stages<-bind_rows(n_plants_flrs,
-                           n_plants_frts_dev,
-                           n_plants_frts_coll,
-                           n_plants_sds,
-                           n_plants_sds_per_frt)
+n_plants_sds <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(sds_collected)) %>%
+  summarize(n = n_distinct(plant_id))
+n_plants_sds <- n_plants_sds %>%
+  mutate(stage = "sds_collected")
 
 
-plant_repro_summary<-plant_repro_summary %>% 
+n_plants_sds_per_frt <- ha_size_data %>%
+  filter(mo == "01") %>%
+  filter(!is.na(sds_per_frt)) %>%
+  summarize(n = n_distinct(plant_id))
+n_plants_sds_per_frt <- n_plants_sds_per_frt %>%
+  mutate(stage = "sds_per_frt")
+
+n_plants_stages <- bind_rows(
+  n_plants_flrs,
+  n_plants_frts_dev,
+  n_plants_frts_coll,
+  n_plants_sds,
+  n_plants_sds_per_frt
+)
+
+
+plant_repro_summary <- plant_repro_summary %>%
   left_join(n_plants_stages)
 plant_repro_summary
 
