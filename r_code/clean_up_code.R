@@ -156,47 +156,45 @@ ha_size_data <-
   mutate(sds_per_frt = sds_collected / frts_collected) %>%
   relocate(dev_frts, .before = "frts_collected") %>%
   relocate(c(shoots, ht, total_la), .after = "trt") %>%
-  relocate(sds_per_frt, .after = "frts_collected") %>%
+  relocate(sds_per_frt, .after = "sds_collected") %>%
   relocate(lvs, .before = "total_la")
 
 
+rm(AREAS,
+   ha_size_aug98,
+   ha_size_jan98
+   )
+
+# names(ha_size_data)
 
 
+# add the ranges of values for each repro variable ------------------------
 
-# replace NA in frts and seeds with zero ----------------------------------
+# 
+# 
+# ranges <- ha_size_data %>%
+#   filter(mo == "01") %>%
+#   summarize(
+#     flrs = range(flrs, na.rm = TRUE),
+#     frts_dev = range(dev_frts, na.rm = TRUE),
+#     frts_collect = range(frts_collected, na.rm = TRUE),
+#     sds_collected = range(sds_collected, na.rm = TRUE)
+#   ) %>%
+#   mutate(range = c("low", "high"), .before = 1) %>%
+#   pivot_longer(
+#     cols = "flrs":"sds_collected",
+#     values_to = "value",
+#     names_to = "stage"
+#   ) %>%
+#   pivot_wider(
+#     id_cols = "stage",
+#     names_from = "range"
+#   ) %>%
+#   mutate(range = paste(low, high, sep = "-")) %>%
+#   select(-low, -high)
 
-# ha_size_data <- replace_na(
-#   ha_size_data,
-#   list(frts_collected = 0, sds_collected = 0)
-# )
 
-
-# quick summaries  ----------------------------------------------------
-
-hist(ha_size_data$flrs)
-
-# ranges
-
-ranges <- ha_size_data %>%
-  filter(mo == "01") %>%
-  summarize(
-    flrs = range(flrs, na.rm = TRUE),
-    frts_dev = range(dev_frts, na.rm = TRUE),
-    frts_collect = range(frts_collected, na.rm = TRUE),
-    sds_collected = range(sds_collected, na.rm = TRUE)
-  ) %>%
-  mutate(range = c("low", "high"), .before = 1) %>%
-  pivot_longer(
-    cols = "flrs":"sds_collected",
-    values_to = "value",
-    names_to = "stage"
-  ) %>%
-  pivot_wider(
-    id_cols = "stage",
-    names_from = "range"
-  ) %>%
-  mutate(range = paste(low, high, sep = "-")) %>%
-  select(-low, -high)
+# summarize mean, sd, range of each repro variable  -----------------------
 
 
 plant_repro_summary <- ha_size_data %>%
@@ -245,6 +243,9 @@ plant_repro_summary <- ha_size_data %>%
   select(stage, mean, sd, range)
 
 plant_repro_summary
+
+
+# add sample size for each reprod variable --------------------------------
 
 
 
@@ -297,6 +298,19 @@ n_plants_stages <- bind_rows(
 plant_repro_summary <- plant_repro_summary %>%
   left_join(n_plants_stages)
 plant_repro_summary
+
+
+rm(n_plants_flrs,
+   n_plants_frts_dev,
+   n_plants_frts_coll,
+   n_plants_sds,
+   n_plants_sds_per_frt,
+   n_plants_stages
+)
+
+
+# histograms of each repro variable ---------------------------------------
+
 
 hist(ha_size_data$flrs)
 hist(ha_size_data$dev_frts)
