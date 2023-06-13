@@ -53,7 +53,19 @@ The clean data has the following columns
 
 
 
+## Citation
 
+@dataset{emilio_m_bruna_2021_5041931,
+  author       = {Emilio M. Bruna},
+  title        = {{Leaf number, leaf area, shoot number, and height 
+                   of reproductive H. acuminata}},
+  month        = jun,
+  year         = 2021,
+  publisher    = {Zenodo},
+  version      = {v1.0.0},
+  doi          = {10.5281/zenodo.5041931},
+  url          = {https://doi.org/10.5281/zenodo.5041931}
+}
 
 
 
