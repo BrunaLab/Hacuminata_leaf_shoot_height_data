@@ -55,7 +55,7 @@ The clean data has the following columns
 
 ## Citation
 
-@dataset{emilio_m_bruna_2021_5041931,
+@misc{emilio_m_bruna_2021_5041931,
   author       = {Emilio M. Bruna},
   title        = {{Leaf number, leaf area, shoot number, and height 
                    of reproductive H. acuminata}},
